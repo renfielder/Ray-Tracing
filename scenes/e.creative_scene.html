@@ -1,0 +1,117 @@
+<head>
+	<title>Creative Scene</title>
+	<meta charset="utf-8"/>
+</head>
+<body>
+<script src="../three.min.js"></script>
+<script src="../raytracer.js"></script>
+<script src="../camera.js"></script>
+<script src="../light.js"></script>
+<script src="../shape.js"></script>
+<script src="../material.js"></script>
+
+<script>
+	let imageWidth = 640;
+	let imageHeight = 480;
+	let exposure = 1;
+	let backgroundColor = new THREE.Color(0, 0, 0);
+	let ambientLight = new THREE.Color(0.01, 0.01, 0.01);
+	let maxDepth = 5;
+	let camera;
+	let shapes = [];
+	let lights = [];
+	function init() {
+		// create camera
+		let eye = new THREE.Vector3(8, 5, 9);
+		let target = new THREE.Vector3(0.25, 0, 0.5);
+		let up = new THREE.Vector3(0, 1, 0);
+		let fov = 20;
+		camera = new PinholeCamera(eye, target, up, fov, imageWidth/imageHeight);
+
+		// simulate an area light by discretizing it into NsxNs point lights
+        createAreaLight(new THREE.Vector3(10, 10, 5), 2, new THREE.Color(25, 25, 25), 10);
+        
+        let diffuseMat = DiffuseMaterial(new THREE.Color(1, 1, 0.2), new THREE.Color(1, 1, 0.2));
+        let pinkMat = DiffuseMaterial(new THREE.Color(1.0, 0.2, 0.2),new THREE.Color(1.0, 0.2, 0.2));
+		shapes.push(new Triangle(new THREE.Vector3(-1,0,0), new THREE.Vector3(1,0,0), new THREE.Vector3(1,1,-1), 
+             diffuseMat));
+
+        // shapes.push(new Triangle(new THREE.Vector3(1,1,-1), new THREE.Vector3(0,0,0), new THREE.Vector3(-1,0,0), 
+        // pinkMat));
+        shapes.push(new Triangle(new THREE.Vector3(-4,0,0), new THREE.Vector3(-1,0,0), new THREE.Vector3(-2,-1,0),
+        diffuseMat));
+
+        // shapes.push(new Triangle(new THREE.Vector3(1,0,0), new THREE.Vector3(-1,0,0), new THREE.Vector3(-1,-1,1), 
+        // diffuseMat));
+        //shapes.push(new Triangle(new THREE.Vector3(20,10,20),new THREE.Vector3(10,10,10), new THREE.Vector3(0,-1,-1), diffuseMat));
+
+        let darkgrey = new THREE.Color(0.05,0.05,0.05);
+        let lightergrey = new THREE.Color(0.18,0.18,0.18);
+
+        //create bottom sphere
+        let center = new THREE.Vector3(-0.25, -1.15, 0.25);
+		let radius = 0.75;
+		let ka = new THREE.Color(1.0, 0.2, 0.2);
+		let kd = new THREE.Color(1.0, 0.2, 0.2);
+		let ks = new THREE.Color(2, 2, 2);
+		let p = 20;
+        //shapes.push(new Sphere(center, radius, PhongMaterial(ka, kd, ks, p)));
+        shapes.push(new Sphere(center, radius, DiffuseMaterial(darkgrey,lightergrey)));
+
+             //create center sphere
+        center = new THREE.Vector3(-0.25, 0, 0.25);
+		radius = 0.55;
+		ka = new THREE.Color(1.0, 0.2, 0.2);
+		kd = new THREE.Color(1.0, 0.2, 0.2);
+		// let ks = new THREE.Color(2, 2, 2);
+		// let p = 20;
+        //shapes.push(new Sphere(center, radius, PhongMaterial(ka, kd, ks, p)));
+        shapes.push(new Sphere(center, radius, DiffuseMaterial(darkgrey,lightergrey)));
+
+        //create top sphere
+        center = new THREE.Vector3(-0.25, 0.8, 0.25);
+		radius = 0.38;
+		ka = new THREE.Color(1.0, 0.2, 0.2);
+		kd = new THREE.Color(1.0, 0.2, 0.2);
+		// let ks = new THREE.Color(2, 2, 2);
+		// let p = 20;
+        //shapes.push(new Sphere(center, radius, PhongMaterial(ka, kd, ks, p)));
+        shapes.push(new Sphere(center, radius, DiffuseMaterial(darkgrey,lightergrey)));
+        
+        //eyes
+        ks = new THREE.Color(2, 2, 2);
+        p = 10;
+
+        center = new THREE.Vector3(0, 1, 0.75);
+        radius = 0.1;
+        ka = new THREE.Color(1,0,0);
+        kd = new THREE.Color(1,0,0);
+        shapes.push(new Sphere(center, radius, PhongMaterial(ka,kd,ks,p)));
+
+        center = new THREE.Vector3(0.2,1,0.5);
+        radius = 0.1;
+        ka = new THREE.Color(1,0,0);
+        kd = new THREE.Color(1,0,0);
+        shapes.push(new Sphere(center, radius, PhongMaterial(ka,kd,ks,p)));
+
+		
+
+        ka = new THREE.Color(0.2, 0.2, 1.0);
+		kd = new THREE.Color(0.2, 0.2, 1.0);
+		let P = new THREE.Vector3(0, -0.65, 0);
+        let N = new THREE.Vector3(0, 1, 0);
+        ks = new THREE.Color(2, 2, 2);
+        p = 20;
+        let kr = new THREE.Color(1, 0.5, 0.5);
+        //shapes.push(new Plane(P, N, PhongMaterial(ka, kd,ks,p)));
+        shapes.push(new Plane(P,N, MirrorMaterial(kr)));
+
+        	// start ray tracing
+		render(true);
+
+}
+
+window.onload = init;
+</script>
+</body>
+
